@@ -1,0 +1,33 @@
+{
+	"version": "V1.1",
+	"protocol": "TradeOS",
+	"features": [
+		"FlashLoan Executor",
+		"Sniper Bot",
+		"Swap & Leverage Widgets",
+		"Badge Mint Engine",
+		"Arbitrage Router",
+		"Governance Quest System",
+		"Vault Fee Routing",
+		"3D UI Frames with Chain Glow",
+		"Telegram/Discord Signal Feeds"
+	],
+	"chains": [
+		"Ethereum",
+		"Polygon",
+		"Base",
+		"Optimism",
+		"BSC",
+		"Solana",
+		"Monad",
+		"Sonium",
+		"Arbitrum"
+	],
+	"explorer": "/badges",
+	"onboarding": "/onboardingQuest.jsx",
+	"vaultAddresses": {
+		"SOL": "D4JvG7eGEvyGY9jx2SF4HCBztLxdYihRzGqu3jNTpkin",
+		"ETH": "0xE1d7B502606cb13E3daBe25f0cE66dcDbb0e15Aa"
+	},
+	"note": "Badge minting is on-chain and donation-exempt for monads.solana contributors."
+}

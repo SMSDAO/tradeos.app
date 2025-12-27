@@ -1,0 +1,41 @@
+# 🚫 Dependencies and build artifacts
+node_modules/
+.next/
+out/
+dist/
+docs/
+
+# 🔒 Environment variables
+.env
+.env.local
+.env.production
+
+# ⚙️ TradeOS special folders
+tradeos.app/
+
+# 💣 OS & IDE junk
+.DS_Store
+Thumbs.db
+
+# 🖥 Scripts
+*.sh
+*.ps1
+*.bat
+
+# ⚠ npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🧪 Test snapshots and coverage
+coverage/
+# Allow backend tests
+!backend/tests/*.test.js
+!backend/tests/*.spec.js
+
+# 🛠 Custom editor configs
+.vscode/
+.idea/
+
+# 🚫 Misc
+n
