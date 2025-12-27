@@ -16,7 +16,7 @@ class Web3Integration {
     
     try {
       if (this.providerUrl) {
-        this.provider = new ethers.providers.JsonRpcProvider(this.providerUrl);
+        this.provider = new ethers.JsonRpcProvider(this.providerUrl);
         this.initialized = true;
         console.log('[Web3Integration] Provider initialized');
       } else {
@@ -39,7 +39,7 @@ class Web3Integration {
     this.init();
 
     // Validate inputs
-    if (!ethers.utils.isAddress(pairAddress)) {
+    if (!ethers.isAddress(pairAddress)) {
       throw new Error(`Invalid pair address: ${pairAddress}`);
     }
 
@@ -60,7 +60,7 @@ class Web3Integration {
       // In production, this would interact with specific DEX contracts
       // e.g., Uniswap V2/V3, SushiSwap, etc.
       
-      const txHash = ethers.utils.id(`${pairAddress}-${amount}-${Date.now()}`);
+      const txHash = ethers.id(`${pairAddress}-${amount}-${Date.now()}`);
       
       console.log(`[Web3Integration] Distribution executed: ${txHash}`);
       
@@ -89,7 +89,7 @@ class Web3Integration {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    const simulatedTxHash = `0xdryrun${ethers.utils.id(`${pairAddress}-${amount}-${Date.now()}`).slice(0, 60)}`;
+    const simulatedTxHash = `0xdryrun${ethers.id(`${pairAddress}-${amount}-${Date.now()}`).slice(0, 60)}`;
 
     console.log(`[Web3Integration] Simulated distribution: ${simulatedTxHash}`);
 
@@ -116,11 +116,11 @@ class Web3Integration {
     this.init();
 
     // Validate inputs
-    if (!ethers.utils.isAddress(recipient)) {
+    if (!ethers.isAddress(recipient)) {
       throw new Error(`Invalid recipient address: ${recipient}`);
     }
 
-    if (!ethers.utils.isAddress(tokenAddress)) {
+    if (!ethers.isAddress(tokenAddress)) {
       throw new Error(`Invalid token address: ${tokenAddress}`);
     }
 
@@ -140,7 +140,7 @@ class Web3Integration {
       // This is a placeholder for actual token transfer
       // In production, this would interact with ERC20 contract
       
-      const txHash = ethers.utils.id(`${recipient}-${tokenAddress}-${amount}-${Date.now()}`);
+      const txHash = ethers.id(`${recipient}-${tokenAddress}-${amount}-${Date.now()}`);
       
       console.log(`[Web3Integration] Transfer executed: ${txHash}`);
       
@@ -169,7 +169,7 @@ class Web3Integration {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    const simulatedTxHash = `0xdryrun${ethers.utils.id(`${recipient}-${tokenAddress}-${amount}-${Date.now()}`).slice(0, 60)}`;
+    const simulatedTxHash = `0xdryrun${ethers.id(`${recipient}-${tokenAddress}-${amount}-${Date.now()}`).slice(0, 60)}`;
 
     console.log(`[Web3Integration] Simulated transfer: ${simulatedTxHash}`);
 
