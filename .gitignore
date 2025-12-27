@@ -29,8 +29,9 @@ yarn-error.log*
 
 # 🧪 Test snapshots and coverage
 coverage/
-*.test.js
-*.spec.js
+# Allow backend tests
+!backend/tests/*.test.js
+!backend/tests/*.spec.js
 
 # 🛠 Custom editor configs
 .vscode/
