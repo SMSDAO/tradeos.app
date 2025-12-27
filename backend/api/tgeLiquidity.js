@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const LiquidityDistributorService = require('../services/liquidityDistributor');
+const { tgeRateLimiter, strictRateLimiter } = require('../middleware/rateLimiter');
 
 const liquidityService = new LiquidityDistributorService();
 
@@ -34,7 +35,7 @@ const checkFeatureEnabled = (req, res, next) => {
 };
 
 // POST /api/tge/liquidity/plan - Create or update a distribution plan
-router.post('/plan', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/plan', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { planId, ...planData } = req.body;
     const wallet = req.user.wallet;
@@ -63,7 +64,7 @@ router.post('/plan', authenticate, checkFeatureEnabled, async (req, res) => {
 });
 
 // POST /api/tge/liquidity/execute - Execute a distribution plan
-router.post('/execute', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/execute', strictRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { planId, dryRun } = req.body;
 
@@ -94,7 +95,7 @@ router.post('/execute', authenticate, checkFeatureEnabled, async (req, res) => {
 });
 
 // GET /api/tge/liquidity/status/:planId? - Get plan status and execution history
-router.get('/status/:planId?', authenticate, checkFeatureEnabled, async (req, res) => {
+router.get('/status/:planId?', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { planId } = req.params;
 
@@ -123,7 +124,7 @@ router.get('/status/:planId?', authenticate, checkFeatureEnabled, async (req, re
 });
 
 // POST /api/tge/liquidity/validate - Validate a plan without saving
-router.post('/validate', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/validate', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const planData = req.body;
     const validation = liquidityService.validatePlan(planData);

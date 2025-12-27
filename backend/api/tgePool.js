@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const LaunchPoolService = require('../services/launchPool');
+const { tgeRateLimiter, strictRateLimiter, publicRateLimiter } = require('../middleware/rateLimiter');
 
 const poolService = new LaunchPoolService();
 
@@ -34,7 +35,7 @@ const checkFeatureEnabled = (req, res, next) => {
 };
 
 // POST /api/tge/pool/create - Create a new launch pool
-router.post('/create', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/create', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const poolData = req.body;
     const wallet = req.user.wallet;
@@ -56,7 +57,7 @@ router.post('/create', authenticate, checkFeatureEnabled, async (req, res) => {
 });
 
 // POST /api/tge/pool/deposit - Deposit to a launch pool
-router.post('/deposit', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/deposit', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { poolId, amount } = req.body;
     const wallet = req.user.wallet;
@@ -92,7 +93,7 @@ router.post('/deposit', authenticate, checkFeatureEnabled, async (req, res) => {
 });
 
 // POST /api/tge/pool/claim - Claim allocated tokens
-router.post('/claim', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/claim', strictRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { poolId, dryRun } = req.body;
     const wallet = req.user.wallet;
@@ -123,7 +124,7 @@ router.post('/claim', authenticate, checkFeatureEnabled, async (req, res) => {
 });
 
 // POST /api/tge/pool/finalize - Finalize a pool and compute allocations
-router.post('/finalize', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/finalize', strictRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { poolId } = req.body;
 
@@ -151,7 +152,7 @@ router.post('/finalize', authenticate, checkFeatureEnabled, async (req, res) => 
 });
 
 // GET /api/tge/pool/status/:poolId - Get pool status
-router.get('/status/:poolId', checkFeatureEnabled, async (req, res) => {
+router.get('/status/:poolId', publicRateLimiter, checkFeatureEnabled, async (req, res) => {
   try {
     const { poolId } = req.params;
 
@@ -171,7 +172,7 @@ router.get('/status/:poolId', checkFeatureEnabled, async (req, res) => {
 });
 
 // GET /api/tge/pool/user/:wallet/:poolId? - Get user position
-router.get('/user/:wallet/:poolId?', authenticate, checkFeatureEnabled, async (req, res) => {
+router.get('/user/:wallet/:poolId?', tgeRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { wallet, poolId } = req.params;
 
@@ -206,7 +207,7 @@ router.get('/user/:wallet/:poolId?', authenticate, checkFeatureEnabled, async (r
 });
 
 // POST /api/tge/pool/return-unfilled - Return unfilled allocation to treasury
-router.post('/return-unfilled', authenticate, checkFeatureEnabled, async (req, res) => {
+router.post('/return-unfilled', strictRateLimiter, authenticate, checkFeatureEnabled, async (req, res) => {
   try {
     const { poolId } = req.body;
 
