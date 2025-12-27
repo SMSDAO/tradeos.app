@@ -54,7 +54,8 @@ export default function LaunchPool() {
       setSuccess(`Successfully deposited ${depositAmount} tokens!`);
       setDepositAmount('');
       
-      // Refresh pool status
+      // TODO: In production, replace this client-side state update with an API call
+      // to fetch the updated pool status from the server to ensure data consistency
       const updatedCurrentDeposits = selectedPool.currentDeposits + parseFloat(depositAmount);
       setSelectedPool({
         ...selectedPool,

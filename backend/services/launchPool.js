@@ -118,33 +118,34 @@ class LaunchPoolService {
       throw new Error(`Deposit validation failed: ${validation.errors.join(', ')}`);
     }
 
-    // Check for existing deposit
-    let deposit = await LaunchPoolDeposit.findOne({ poolId, wallet });
-    
-    if (deposit) {
-      // Update existing deposit
-      const newTotal = deposit.amount + amount;
-      
-      // Re-validate with new total
-      if (newTotal > pool.individualMax) {
-        throw new Error(`Total deposit would exceed individual max of ${pool.individualMax}`);
+    // Use findOneAndUpdate with upsert to handle concurrent deposits atomically
+    const deposit = await LaunchPoolDeposit.findOneAndUpdate(
+      { poolId, wallet },
+      { 
+        $inc: { amount: amount },
+        $setOnInsert: { 
+          poolId, 
+          wallet,
+          allocatedTokens: 0,
+          claimed: false
+        }
+      },
+      { 
+        new: true, 
+        upsert: true,
+        runValidators: true
       }
-      
-      deposit.amount = newTotal;
+    );
+
+    // Check if total exceeds individual max after update
+    if (deposit.amount > pool.individualMax) {
+      // Rollback by removing the added amount
+      deposit.amount -= amount;
       await deposit.save();
-      
-      console.log(`[LaunchPool] Deposit updated for ${wallet} in pool ${poolId}: ${newTotal}`);
-    } else {
-      // Create new deposit
-      deposit = new LaunchPoolDeposit({
-        poolId,
-        wallet,
-        amount
-      });
-      await deposit.save();
-      
-      console.log(`[LaunchPool] New deposit from ${wallet} in pool ${poolId}: ${amount}`);
+      throw new Error(`Total deposit would exceed individual max of ${pool.individualMax}`);
     }
+    
+    console.log(`[LaunchPool] Deposit from ${wallet} in pool ${poolId}: ${amount} (total: ${deposit.amount})`);
 
     // Update pool current deposits
     pool.currentDeposits = await this.getTotalDeposits(poolId);

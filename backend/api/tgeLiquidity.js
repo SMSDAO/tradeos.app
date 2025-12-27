@@ -74,8 +74,8 @@ router.post('/execute', authenticate, checkFeatureEnabled, async (req, res) => {
       });
     }
 
-    // Default to dry-run if not specified or TGE_DRY_RUN_MODE is enabled
-    const isDryRun = dryRun !== false && (dryRun === true || process.env.TGE_DRY_RUN_MODE === 'true');
+    // Prioritize global dry-run mode for safety
+    const isDryRun = process.env.TGE_DRY_RUN_MODE === 'true' || dryRun !== false;
 
     const execution = await liquidityService.executePlan(planId, isDryRun);
 

@@ -104,7 +104,8 @@ router.post('/claim', authenticate, checkFeatureEnabled, async (req, res) => {
       });
     }
 
-    const isDryRun = dryRun === true || process.env.TGE_DRY_RUN_MODE === 'true';
+    // Prioritize global dry-run mode, but allow explicit dry-run requests
+    const isDryRun = process.env.TGE_DRY_RUN_MODE === 'true' || dryRun === true;
     const result = await poolService.claim(poolId, wallet, isDryRun);
 
     res.json({ 
