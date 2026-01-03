@@ -1,0 +1,2 @@
+This is a placeholder for the splash screen.
+Replace with a 2048x2048 PNG file named splash.png
