@@ -1,0 +1,2 @@
+This is a placeholder for the web favicon.
+Replace with a 48x48 PNG file named favicon.png
