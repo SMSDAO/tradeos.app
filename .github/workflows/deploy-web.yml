@@ -1,0 +1,55 @@
+name: Deploy Web Admin to Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web-admin/**'
+      - 'packages/shared/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build shared packages
+        run: pnpm turbo run build --filter=shared
+      
+      - name: Build web-admin
+        run: pnpm turbo run build --filter=web-admin
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./apps/web-admin
+          vercel-args: '--prod'
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ Web admin deployed to Vercel"
+          echo "🔗 Check deployment status in Vercel dashboard"

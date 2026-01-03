@@ -1,0 +1,69 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/supabase/migrations/**'
+      - '.github/workflows/supabase-migrations.yml'
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      
+      - name: Link to Supabase project
+        run: |
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      
+      - name: Run migrations
+        working-directory: ./infra/supabase
+        run: |
+          supabase db push --include-seed
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      
+      - name: Migration summary
+        run: |
+          echo "✅ Database migrations applied successfully"
+          echo "🗄️ Check Supabase dashboard for verification"
+          echo ""
+          echo "Applied migrations in infra/supabase/migrations/"
+
+  deploy-functions:
+    runs-on: ubuntu-latest
+    needs: migrate
+    if: ${{ always() }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      
+      - name: Deploy edge functions
+        working-directory: ./infra/supabase
+        run: |
+          supabase functions deploy notify-on-new-message --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ Edge functions deployed successfully"
+          echo "⚡ Functions are now live on Supabase Edge Network"
