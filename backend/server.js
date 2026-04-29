@@ -13,6 +13,8 @@ app.use('/api/sniper', require('./api/sniper'));
 app.use('/api/deployToken', require('./api/deployToken'));
 app.use('/api/governance', require('./api/governance'));
 app.use('/api/lpScore', require('./api/lpScore'));
+app.use('/api/tge/liquidity', require('./api/tgeLiquidity'));
+app.use('/api/tge/pool', require('./api/tgePool'));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
